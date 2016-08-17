@@ -71,18 +71,12 @@ view model =
     div
       [ onMouseDown
       , style
-        [ "background-color" => "transparent"
-        , "cursor" => "move"
-        , "width" => "100px"
+        [ "cursor" => "move"
         , "font-size" => "48px"
-        , "height" => "100px"
         , "position" => "absolute"
         , "left" => px realPosition.x
         , "top" => px realPosition.y
         , "color" => "#FF0000"
-        , "display" => "flex"
-        , "align-items" => "center"
-        , "justify-content" => "center"
         ]
       ]
       [ text "D"
