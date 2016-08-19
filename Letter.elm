@@ -1,7 +1,6 @@
-module Letter exposing (Msg, Model, update, view, init)
+module Letter exposing (Msg, Model, update, view, init, subscriptions)
 
 import Html exposing (..)
-import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (on)
 import Json.Decode as Json exposing ((:=))
@@ -85,10 +84,10 @@ px number =
   toString number ++ "px"
 
 getPosition : Model -> Position
-getPosition {_, position, drag} =
+getPosition {letter, position, drag} =
   case drag of
     Nothing -> 
-      positioin
+      position
 
     Just { start, current } ->
       Position

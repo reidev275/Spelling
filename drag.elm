@@ -1,101 +1,46 @@
 import Html exposing (..)
 import Html.App as App
-import Html.Attributes exposing (..)
+--import Html.Attributes exposing (..)
 import Html.Events exposing (on)
-import Json.Decode as Json exposing ((:=))
+--import Json.Decode as Json exposing ((:=))
 import Mouse exposing (Position)
+import Letter as Letter 
+import String exposing (split)
 
 main = 
   App.program
     { init = init
     , view = view
-    , update = update
-    , subscriptions = subscriptions
+    , update = Letter.update 
+    , subscriptions = Letter.subscriptions
     }
  
 type alias Model =
-  { position : Position
-  , drag : Maybe Drag
+  { letters : List Letter.Model
   }
 
-type alias Drag = 
-  { start : Position
-  , current : Position
-  }
 
-init : ( Model, Cmd Msg )
+init : Model
 init = 
-  ( Model (Position 200 200) Nothing, Cmd.none )
+  Model <| List.map Letter.init (split "" "no")
 
+{-
 type Msg
-  = DragStart Position
-  | DragAt Position
-  | DragEnd Position
+  = Letter Letter.Msg
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
-  ( updateHelp msg model, Cmd.none )
-
-updateHelp : Msg -> Model -> Model
-updateHelp msg ({position, drag} as model) =
   case msg of
-    DragStart xy ->
-      Model position (Just (Drag xy xy))
+    Letter msg ->
+-}   
 
-    DragAt xy ->
-      Model position (Maybe.map (\{start} -> Drag start xy) drag)
-
-    DragEnd _ ->
-      Model (getPosition model) Nothing
-
--- SUBSCRIPTIONS
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-  case model.drag of
-    Nothing -> 
-      Sub.none
-
-    Just _ ->
-      Sub.batch [ Mouse.moves DragAt, Mouse.ups DragEnd ]
+  
 
 -- VIEW
 
-(=>) = (,)
-
-view : Model -> Html Msg
+view : Model -> Html Letter.Msg
 view model =
-  let
-    realPosition = getPosition model
-  in
-    div
-      [ onMouseDown
-      , style
-        [ "cursor" => "move"
-        , "font-size" => "48px"
-        , "position" => "absolute"
-        , "left" => px realPosition.x
-        , "top" => px realPosition.y
-        , "color" => "#FF0000"
-        ]
-      ]
-      [ text "D"
-      ]
-
-px : Int -> String
-px number =
-  toString number ++ "px"
-
-getPosition : Model -> Position
-getPosition {position, drag} =
-  case drag of
-    Nothing -> position
-
-    Just {start, current} ->
-      Position
-        (position.x + current.x - start.x)
-        (position.y + current.y - start.y)
-
-onMouseDown : Attribute Msg
-onMouseDown =
-  on "mousedown" (Json.map DragStart Mouse.position)
+  div
+    []
+    [ text "D"
+    ]
