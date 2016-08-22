@@ -1,46 +1,81 @@
 import Html exposing (..)
 import Html.App as App
---import Html.Attributes exposing (..)
 import Html.Events exposing (on)
---import Json.Decode as Json exposing ((:=))
 import Mouse exposing (Position)
-import Letter as Letter 
-import String exposing (split)
+import Letter
 
 main = 
   App.program
     { init = init
     , view = view
-    , update = Letter.update 
-    , subscriptions = Letter.subscriptions
+    , update = update 
+    , subscriptions = subscriptions
     }
  
 type alias Model =
-  { letters : List Letter.Model
+  { letters : List IndexedLetter 
+  , uid : Int
+  }
+
+type alias IndexedLetter =
+  { id : Int
+  , model : Letter.Model
   }
 
 
-init : Model
+init : ( Model, Cmd Msg )
 init = 
-  Model <| List.map Letter.init (split "" "no")
+  ( Model 
+    [ IndexedLetter 0 (Letter.init "h")
+    , IndexedLetter 1 (Letter.init "e")
+    , IndexedLetter 2 (Letter.init "l")
+    , IndexedLetter 3 (Letter.init "l")
+    , IndexedLetter 4 (Letter.init "o")
+    ] 0, Cmd.none)
 
-{-
+
+-- UPDATE
+
 type Msg
-  = Letter Letter.Msg
+  = SubMsg Int Letter.Msg
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
-    Letter msg ->
--}   
+    SubMsg id subMsg ->
+      ( 
+        { model 
+          | letters = List.map (updateHelp id subMsg) model.letters
+          }
+        , Cmd.none )
 
-  
+updateHelp : Int -> Letter.Msg -> IndexedLetter -> IndexedLetter
+updateHelp id msg letter =
+  IndexedLetter
+    id
+    ( if letter.id == id
+      then Letter.update msg letter.model
+      else letter.model )
+
+-- SUBSCRIPTIONS
+
+subscriptions : Model -> Sub Msg
+subscriptions model = 
+  Sub.batch (List.map subHelp model.letters)
+
+subHelp : IndexedLetter -> Sub Msg
+subHelp { id, model } = 
+  Sub.map (SubMsg id) (Letter.subscriptions model)
 
 -- VIEW
 
-view : Model -> Html Letter.Msg
+view : Model -> Html Msg
 view model =
   div
     []
-    [ text "D"
-    ]
+    (List.map viewLetter model.letters)
+    
+ 
+viewLetter : IndexedLetter -> Html Msg
+viewLetter {id, model} =
+  App.map (SubMsg id) (Letter.view model)
