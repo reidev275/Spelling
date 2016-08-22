@@ -21,9 +21,9 @@ type alias Drag =
   , current : Position
   }
 
-init : String -> Model
-init s =
-  Model s (Position 200 200) Nothing
+init : String -> Int -> Model
+init s x =
+  Model s (Position x 200) Nothing
 
 -- UPDATE
 

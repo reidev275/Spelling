@@ -26,11 +26,11 @@ type alias IndexedLetter =
 init : ( Model, Cmd Msg )
 init = 
   ( Model 
-    [ IndexedLetter 0 (Letter.init "h")
-    , IndexedLetter 1 (Letter.init "e")
-    , IndexedLetter 2 (Letter.init "l")
-    , IndexedLetter 3 (Letter.init "l")
-    , IndexedLetter 4 (Letter.init "o")
+    [ IndexedLetter 0 (Letter.init "h" 40)
+    , IndexedLetter 1 (Letter.init "e" 0)
+    , IndexedLetter 2 (Letter.init "l" 180)
+    , IndexedLetter 3 (Letter.init "l" 160)
+    , IndexedLetter 4 (Letter.init "o" 120)
     ] 0, Cmd.none)
 
 
@@ -73,7 +73,15 @@ view : Model -> Html Msg
 view model =
   div
     []
-    (List.map viewLetter model.letters)
+    [ div
+      []
+      [ text "drag the letters to spell 'hello'" ]
+    , div
+      []
+      (List.map viewLetter model.letters)
+    ]
+
+
     
  
 viewLetter : IndexedLetter -> Html Msg
