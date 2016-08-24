@@ -52,7 +52,7 @@ update msg model =
 updateHelp : Int -> Letter.Msg -> IndexedLetter -> IndexedLetter
 updateHelp id msg letter =
   IndexedLetter
-    id
+    letter.id
     ( if letter.id == id
       then Letter.update msg letter.model
       else letter.model )
