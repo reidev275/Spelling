@@ -8799,9 +8799,45 @@ var _user$project$Letter$view = function (model) {
 				_elm_lang$html$Html$text(model.letter)
 			]));
 };
-var _user$project$Main$Model = F2(
-	function (a, b) {
-		return {letters: a, uid: b};
+var _user$project$Main$getLetterColor = function (model) {
+	return model.isCorrect ? _elm_lang$html$Html_Attributes$style(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: 'color', _1: 'green'}
+			])) : _elm_lang$html$Html_Attributes$style(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: 'color', _1: 'red'}
+			]));
+};
+var _user$project$Main$correctHelp = function (model) {
+	var answer = A2(
+		_elm_lang$core$List$map,
+		function (x) {
+			return x.model.letter;
+		},
+		A2(
+			_elm_lang$core$List$sortBy,
+			function (_) {
+				return _.id;
+			},
+			model.letters));
+	var current = A2(
+		_elm_lang$core$List$map,
+		function (x) {
+			return x.model.letter;
+		},
+		A2(
+			_elm_lang$core$List$sortBy,
+			function (x) {
+				return x.model.position.x;
+			},
+			model.letters));
+	return _elm_lang$core$Native_Utils.eq(current, answer);
+};
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {letters: a, uid: b, isCorrect: c};
 	});
 var _user$project$Main$IndexedLetter = F2(
 	function (a, b) {
@@ -8809,7 +8845,7 @@ var _user$project$Main$IndexedLetter = F2(
 	});
 var _user$project$Main$init = {
 	ctor: '_Tuple2',
-	_0: A2(
+	_0: A3(
 		_user$project$Main$Model,
 		_elm_lang$core$Native_List.fromArray(
 			[
@@ -8834,7 +8870,8 @@ var _user$project$Main$init = {
 				4,
 				A2(_user$project$Letter$init, 'o', 120))
 			]),
-		0),
+		0,
+		false),
 	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$Main$updateHelp = F3(
@@ -8846,19 +8883,24 @@ var _user$project$Main$updateHelp = F3(
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		return {
-			ctor: '_Tuple2',
-			_0: _elm_lang$core$Native_Utils.update(
-				model,
-				{
-					letters: A2(
-						_elm_lang$core$List$map,
-						A2(_user$project$Main$updateHelp, _p0._0, _p0._1),
-						model.letters)
-				}),
-			_1: _elm_lang$core$Platform_Cmd$none
-		};
+		if (model.isCorrect) {
+			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		} else {
+			var _p0 = msg;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						letters: A2(
+							_elm_lang$core$List$map,
+							A2(_user$project$Main$updateHelp, _p0._0, _p0._1),
+							model.letters),
+						isCorrect: _user$project$Main$correctHelp(model)
+					}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		}
 	});
 var _user$project$Main$SubMsg = F2(
 	function (a, b) {
@@ -8900,7 +8942,9 @@ var _user$project$Main$view = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[]),
+					[
+						_user$project$Main$getLetterColor(model)
+					]),
 				A2(_elm_lang$core$List$map, _user$project$Main$viewLetter, model.letters))
 			]));
 };
