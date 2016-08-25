@@ -1,6 +1,7 @@
 import Html exposing (..)
 import Html.App as App
 import Html.Events exposing (on)
+import Html.Attributes exposing (style)
 import Mouse exposing (Position)
 import Letter
 
@@ -15,6 +16,7 @@ main =
 type alias Model =
   { letters : List IndexedLetter 
   , uid : Int
+  , isCorrect : Bool
   }
 
 type alias IndexedLetter =
@@ -31,7 +33,7 @@ init =
     , IndexedLetter 2 (Letter.init "l" 180)
     , IndexedLetter 3 (Letter.init "l" 160)
     , IndexedLetter 4 (Letter.init "o" 120)
-    ] 0, Cmd.none)
+    ] 0 False, Cmd.none)
 
 
 -- UPDATE
@@ -41,13 +43,28 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  case msg of
-    SubMsg id subMsg ->
-      ( 
-        { model 
-          | letters = List.map (updateHelp id subMsg) model.letters
+  if model.isCorrect
+  then ( model, Cmd.none )
+  else 
+    case msg of
+      SubMsg id subMsg ->
+        ( 
+          { model | 
+              letters = List.map (updateHelp id subMsg) model.letters,
+              isCorrect = correctHelp model
           }
-        , Cmd.none )
+          , Cmd.none )
+
+correctHelp model =
+  let
+    current = model.letters 
+              |> List.sortBy (\x -> x.model.position.x) 
+              |> List.map (\x -> x.model.letter)
+    answer = model.letters 
+             |> List.sortBy .id 
+             |> List.map (\x -> x.model.letter)
+  in 
+     current == answer
 
 updateHelp : Int -> Letter.Msg -> IndexedLetter -> IndexedLetter
 updateHelp id msg letter =
@@ -77,10 +94,16 @@ view model =
       []
       [ text "drag the letters to spell 'hello'" ]
     , div
-      []
+      [ getLetterColor model ]
       (List.map viewLetter model.letters)
     ]
 
+getLetterColor : Model -> Attribute Msg
+getLetterColor model =
+  if model.isCorrect
+  then style [ ("color", "green") ]
+  else style [ ("color", "red") ]
+    
 
     
  
