@@ -10,7 +10,7 @@ import CharacterHelper exposing (position)
 
 main = 
   App.program
-    { init = init
+    { init = init "cooperate"
     , view = view
     , update = update 
     , subscriptions = subscriptions
@@ -18,6 +18,7 @@ main =
  
 type alias Model =
   { letters : List IndexedLetter 
+  , word : String
   , isCorrect : Bool
   }
 
@@ -27,16 +28,23 @@ type alias IndexedLetter =
   }
 
 
-init : ( Model, Cmd Msg )
-init = 
-  ( { letters = (toIndexedLetters "hello")
+init : String -> ( Model, Cmd Msg )
+init s = 
+  ( { letters = (toIndexedLetters s)
+    , word = s
     , isCorrect = False
     }
   , Cmd.none)
 
 toIndexedLetters : String -> List IndexedLetter
 toIndexedLetters s =
-  indexedMap (\i x -> IndexedLetter i (Letter.init x (10 * (position x)))) (split "" s)
+  indexedMap letterHelp (split "" s)
+
+letterHelp : Int -> String -> IndexedLetter
+letterHelp i x =
+    { id = i
+    , model = position x |> (*) 10 |> Letter.init x
+    }
 
 -- UPDATE
 
@@ -94,7 +102,7 @@ view model =
     []
     [ div
       []
-      [ text "drag the letters to spell 'hello'" ]
+      [ text ("drag the letters to spell " ++ model.word) ]
     , div
       [ getLetterColor model ]
       (List.map viewLetter model.letters)
