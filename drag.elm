@@ -4,6 +4,9 @@ import Html.Events exposing (on)
 import Html.Attributes exposing (style)
 import Mouse exposing (Position)
 import Letter
+import List exposing (indexedMap)
+import String exposing (split)
+import CharacterHelper exposing (position)
 
 main = 
   App.program
@@ -15,7 +18,6 @@ main =
  
 type alias Model =
   { letters : List IndexedLetter 
-  , uid : Int
   , isCorrect : Bool
   }
 
@@ -27,14 +29,14 @@ type alias IndexedLetter =
 
 init : ( Model, Cmd Msg )
 init = 
-  ( Model 
-    [ IndexedLetter 0 (Letter.init "h" 40)
-    , IndexedLetter 1 (Letter.init "e" 0)
-    , IndexedLetter 2 (Letter.init "l" 180)
-    , IndexedLetter 3 (Letter.init "l" 160)
-    , IndexedLetter 4 (Letter.init "o" 120)
-    ] 0 False, Cmd.none)
+  ( { letters = (toIndexedLetters "hello")
+    , isCorrect = False
+    }
+  , Cmd.none)
 
+toIndexedLetters : String -> List IndexedLetter
+toIndexedLetters s =
+  indexedMap (\i x -> IndexedLetter i (Letter.init x (10 * (position x)))) (split "" s)
 
 -- UPDATE
 
